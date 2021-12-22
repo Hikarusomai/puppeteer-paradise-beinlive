@@ -1,0 +1,35 @@
+{
+  "name": "puppeteer-test",
+  "version": "1.0.0",
+  "description": "chrome to database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hikarusomai/puppeter-test.git"
+  },
+  "keywords": [
+    "puppeter"
+  ],
+  "author": "Salim",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Hikarusomai/puppeter-test/issues"
+  },
+  "homepage": "https://github.com/Hikarusomai/puppeter-test#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "express": "^4.17.1",
+    "imgbb-uploader": "^1.3.3",
+    "mysql": "^2.18.1",
+    "puppeteer": "^11.0.0",
+    "puppeteer-extra": "^3.2.3",
+    "puppeteer-extra-plugin-stealth": "^2.9.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
