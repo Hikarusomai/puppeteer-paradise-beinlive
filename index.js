@@ -1,26 +1,17 @@
 const http = require('http');
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql');
 const puppeteer = require('puppeteer');
-const hostname = 'localhost';
 const port = 4000;
-const imgbb_api_key = '7b1c1af5dd76b274102cf046c218b758'; 
-const axios = require('axios');
+// const axios = require('axios');
 const imgbbUploader = require("imgbb-uploader");
-// const puppeteer = require('puppeteer-extra')
-// var db = mysql.createConnection({
-//     host: "localhost",
-//     user: "root",
-//     password: "",
-//     database: 'test_project2'
-// });
-
-// db.connect((err) => {
-//     if(err){
-//         throw err;
-//     }
-// // console.log('Mysql Connected');
-// });
+const db_username = process.env.DB_USERNAME;
+const db_password = process.env.DB_PASSWORD;
+const db_host = process.env.DB_HOST;
+const img_apikey = process.env.IMG_APIKEY;
+const proxy_apikey = process.env.PROXY_APIKEY;
+const scrap_url = 'http://api.scraperapi.com';
 
 const app = express(); 
 // app.enable('trust proxy');
@@ -66,7 +57,7 @@ app.get('/testing2',function(req,res){
          'Accept-Language': 'en'
         });
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36');
-        var proxy = 'http://api.scraperapi.com?api_key=fdca8e61dbd48154c111fa88268ab7d8&url=';
+        var proxy = scrap_url+'?api_key='+proxy_apikey+'&url=';
 
         await page.goto(proxy+req.query.produit_url)
         const scrapedData = await page.evaluate(() => {
@@ -105,10 +96,10 @@ app.get('/getproduct', async (req,res) => {
     'Accept-Language': 'en'
    });
    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36');
-   var proxy = 'https://api.scraperapi.com/?api_key=a168d0ff73681f844eb5c4a6fc1ae0e3&url=';
+   var proxy = scrap_url+'?api_key='+proxy_apikey+'&url=';
 
    await page.goto(proxy+req.query.produit_url,{waitUntil: 'load',timeout: 0});//{waitUntil: 'load',timeout: 0});
-//   await page.waitFor(1700);
+    //   await page.waitFor(1700);
     // await page.waitForSelector('.product-name');
     // res.status(200).jsonp({ status:true,data: await page.evaluate(async () => {return document.querySelector('body').innerHtml;}) });
     let urls = await page.evaluate(async () => { 
@@ -142,7 +133,7 @@ app.get('/getproduct', async (req,res) => {
     // let tempurl = urls[0].images;
     // for(let val of tempurl) { 
     //     const options = {
-    //         apiKey: '7b1c1af5dd76b274102cf046c218b758', // MANDATORY 
+    //         apiKey: img_apikey, // MANDATORY 
     //         imageUrl: val.url,    
     //       };  
     //       const imgresponse = await imgbbUploader(options)
@@ -209,7 +200,7 @@ app.post('/getproductloop', async (req,res) => {
     let tempurl = urls[index][0].images;
     for(let val of tempurl) { 
         const options = {
-            apiKey: '7b1c1af5dd76b274102cf046c218b758', // MANDATORY 
+            apiKey: img_apikey, // MANDATORY 
             imageUrl: val.url,    
           };  
           const imgresponse = await imgbbUploader(options)
@@ -256,11 +247,11 @@ app.get('/test', async (req,res) => {
         
     // });  
 });
-app.get('/beinlive/today', async (req,res) => {//res.send('hellow');
+app.get('/beinlive/today', async (req,res) => {
     var db = mysql.createConnection({
-        host: "127.0.0.1",
-        user: "root",
-        password: "P@ssw0rd",
+        host: db_host,
+        user: db_username,
+        password: db_password,
         database: 'beinlive'
     });
 
@@ -305,19 +296,19 @@ app.get('/beinlive/today', async (req,res) => {//res.send('hellow');
     });
     await browser.close();  
     //get uploaded image 
-    const options = {
-      apiKey: '7b1c1af5dd76b274102cf046c218b758', // MANDATORY 
-      imageUrl: tem[0].second_team_icon,    
-    };  
-    const imgresponse = await imgbbUploader(options);
-    tem[0].second_team_icon = imgresponse.image.url;
+    // const options = {
+    //   apiKey: img_apikey, // MANDATORY 
+    //   imageUrl: tem[0].second_team_icon,    
+    // };  
+    // const imgresponse = await imgbbUploader(options);
+    // tem[0].second_team_icon = imgresponse.image.url;
 
-    const options2 = {
-        apiKey: '7b1c1af5dd76b274102cf046c218b758', // MANDATORY 
-        imageUrl: tem[0].first_team_icon,    
-    };  
-    const imgresponse2 = await imgbbUploader(options2);
-    tem[0].first_team_icon = imgresponse2.image.url;
+    // const options2 = {
+    //     apiKey: img_apikey, // MANDATORY 
+    //     imageUrl: tem[0].first_team_icon,    
+    // };  
+    // const imgresponse2 = await imgbbUploader(options2);
+    // tem[0].first_team_icon = imgresponse2.image.url;
     let values=tem.reduce((o,a)=>{
             let ini=[];
             ini.push(a.first_team);
@@ -347,27 +338,27 @@ app.get('/beinlive/today', async (req,res) => {//res.send('hellow');
 });
 app.get('/beinlive/tomorrow', async (req,res) => {//res.send('hellow');
     var db = mysql.createConnection({
-        host: "127.0.0.1",
-        user: "root",
-        password: "P@ssw0rd",
+        host: db_host,
+        user: db_username,
+        password: db_password,
         database: 'beinlive'
     });
 
     const link = 'https://kooora4lives.com:2096/matches-tomorrow/';
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
     const page = await browser.newPage(); 
-    await page.goto(link,{waitUntil: 'load',timeout: 0});console.log(1);
-    let tem = await page.evaluate(async () => {console.log(2);
+    await page.goto(link,{waitUntil: 'load',timeout: 0});
+    let tem = await page.evaluate(async () => {
         let results = []; 
         let array = [];  
         // let name = document.querySelector('.product-name h1').innerText; 
         // let price = document.querySelector('span .price').getAttribute('content'); 
         // let description = document.querySelector('.caracteristics .product-tabs:first-child .new-std').innerText;
         // let category = document.querySelector('.product-shop').getAttribute('data-category');
-        let items =  document.querySelectorAll('.match-container');console.log(3);
+        let items =  document.querySelectorAll('.match-container');
         items.forEach( (item) => {  
             //convert time 
-            const [time, modifier] = item.querySelector('#match-time').innerText.split(' ');console.log(4);
+            const [time, modifier] = item.querySelector('#match-time').innerText.split(' ');
             let [hours, minutes] = time.split(':');
             if (hours === '12') {
             hours = '00';
@@ -394,19 +385,19 @@ app.get('/beinlive/tomorrow', async (req,res) => {//res.send('hellow');
     });
     await browser.close();  
     //get uploaded image 
-    const options = {
-      apiKey: '7b1c1af5dd76b274102cf046c218b758', // MANDATORY 
-      imageUrl: tem[0].second_team_icon,    
-    };  
-    const imgresponse = await imgbbUploader(options);
-    tem[0].second_team_icon = imgresponse.image.url;
+    // const options = {
+    //   apiKey: img_apikey, // MANDATORY 
+    //   imageUrl: tem[0].second_team_icon,    
+    // };  
+    // const imgresponse = await imgbbUploader(options);
+    // tem[0].second_team_icon = imgresponse.image.url;
 
-    const options2 = {
-        apiKey: '7b1c1af5dd76b274102cf046c218b758', // MANDATORY 
-        imageUrl: tem[0].first_team_icon,    
-    };  
-    const imgresponse2 = await imgbbUploader(options2);
-    tem[0].first_team_icon = imgresponse2.image.url;
+    // const options2 = {
+    //     apiKey: img_apikey, // MANDATORY 
+    //     imageUrl: tem[0].first_team_icon,    
+    // };  
+    // const imgresponse2 = await imgbbUploader(options2);
+    // tem[0].first_team_icon = imgresponse2.image.url;
     let values=tem.reduce((o,a)=>{
             const today = new Date()
             const tomorrow = new Date(today)
@@ -455,9 +446,9 @@ app.get('/beinlive/tomorrow', async (req,res) => {//res.send('hellow');
 //     return `${hours}:${minutes}`;
 //   }
 // var db = mysql.createConnection({
-//     host: "localhost",
-//     user: "root",
-//     password: "",
+//     host: db_host,
+//     user: db_username,
+//     password: db_password,
 //     database: 'test_project2'
 // });
 app.listen(process.env.PORT || port, () => {
